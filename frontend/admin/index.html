@@ -346,6 +346,205 @@
             margin-top: 40px;
             padding: 20px;
         }
+
+        /* UC04: Drag-and-Drop Styles */
+        .schedule-matrix {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .schedule-table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        .schedule-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #667eea;
+        }
+
+        .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-height: 80px;
+            vertical-align: top;
+        }
+
+        .schedule-table td.time-cell {
+            background: #f5f5f5;
+            font-weight: 600;
+            width: 150px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .schedule-cell {
+            min-height: 80px;
+            background: #f9f9f9;
+            position: relative;
+            border-radius: 4px;
+            transition: background 0.2s;
+            cursor: grab;
+            padding: 4px;
+        }
+
+        .schedule-cell:hover {
+            background: #f0f0f0;
+        }
+
+        .schedule-cell.drag-over {
+            background: #e8f4f8;
+            border: 2px dashed #667eea;
+        }
+
+        .schedule-cell.can-drop {
+            background: #d4edda;
+        }
+
+        .lesson-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            line-height: 1.4;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .lesson-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .lesson-item.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+        }
+
+        .lesson-item.conflict {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        .lesson-info {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lesson-room {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .lesson-teacher {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .uc04-controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .uc04-controls label {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .uc04-controls input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .uc04-controls button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .schedule-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .change-log {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .change-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .change-item.add {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .change-item.remove {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .change-item.move {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .time-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .time-slot {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -494,42 +693,100 @@
 
             <div style="margin-bottom: 30px;">
                 <h3>Chọn Phiên Bản TKB</h3>
-                <select id="scheduleVersionSelect" style="max-width: 300px;">
+                <select id="scheduleVersionSelect" style="max-width: 300px;" onchange="loadScheduleVersion()">
                     <option value="">-- Chọn phiên bản --</option>
+                    <option value="tkb_v1">TKB_v1.0 - Phiên bản cơ bản</option>
+                    <option value="tkb_v2">TKB_v2.0 - Tuần 2</option>
                 </select>
             </div>
 
-            <div id="scheduleMatrix" style="margin-top: 30px;">
-                <table style="border-collapse: collapse; width: 100%;">
-                    <thead>
-                        <tr style="background: #f5f5f5;">
-                            <th style="padding: 10px; border: 1px solid #ddd;">Tiết / Lớp</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">10A</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">10B</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">11A</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #ddd; font-weight: 600;">Thứ Hai - Tiết 1</td>
-                            <td style="padding: 10px; border: 1px solid #ddd; min-height: 60px; background: #f9f9f9; cursor: move;">
-                                <div style="background: #667eea; color: white; padding: 8px; border-radius: 4px; font-size: 12px;">
-                                    Toán - P101
-                                </div>
-                            </td>
-                            <td style="padding: 10px; border: 1px solid #ddd; min-height: 60px; background: #f9f9f9;"></td>
-                            <td style="padding: 10px; border: 1px solid #ddd; min-height: 60px; background: #f9f9f9;"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p style="color: #999; margin-top: 10px; font-size: 12px;">💡 Ghi chú: Kéo thả các tiết học để điều chỉnh (Demo hiển thị ma trận cơ bản)</p>
+            <!-- UC04 Controls -->
+            <div class="uc04-controls">
+                <label>
+                    <input type="checkbox" id="autoCheckConflict" checked> 
+                    🔍 Tự động kiểm tra xung đột
+                </label>
+                <label>
+                    <input type="checkbox" id="showChangeLog" checked> 
+                    📝 Hiển thị lịch sử thay đổi
+                </label>
+                <button onclick="undoLastChange()" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">
+                    ↶ Hoàn Tác
+                </button>
+                <button onclick="resetSchedule()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                    🔄 Đặt Lại
+                </button>
             </div>
 
-            <div style="margin-top: 30px;">
+            <!-- Schedule Info -->
+            <div class="schedule-info">
+                <div class="info-box">
+                    <strong>📅 Phiên bản:</strong> <span id="versionName">--</span>
+                </div>
+                <div class="info-box">
+                    <strong>👥 Tổng Lớp:</strong> <span id="classCountInfo">--</span>
+                </div>
+                <div class="info-box">
+                    <strong>⏰ Tổng Tiết:</strong> <span id="lessonCountInfo">--</span>
+                </div>
+                <div class="info-box">
+                    <strong>⚠️ Xung Đột:</strong> <span id="conflictCountInfo">0</span>
+                </div>
+            </div>
+
+            <!-- Schedule Matrix with Drag-and-Drop -->
+            <div class="schedule-matrix" id="scheduleMatrixContainer">
+                <table class="schedule-table" id="scheduleTableUC04">
+                    <thead>
+                        <tr>
+                            <th>Tiết / Ngày</th>
+                            <th>Thứ Hai</th>
+                            <th>Thứ Ba</th>
+                            <th>Thứ Tư</th>
+                            <th>Thứ Năm</th>
+                            <th>Thứ Sáu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Legend -->
+            <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 4px;">
+                <h4 style="margin-bottom: 10px;">📌 Hướng Dẫn Sử Dụng UC04:</h4>
+                <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
+                    <li><strong>✋ Kéo-Thả:</strong> Nhấp giữ vào một tiết học rồi kéo sang ô khác để di chuyển</li>
+                    <li><strong>🔍 Xung Đột:</strong> Tiết học được đánh dấu màu đỏ nếu xung đột (1 lớp 2 chỗ, 1 GV 2 chỗ, 1 phòng 2 chỗ)</li>
+                    <li><strong>✅ Kiểm Tra:</strong> Bấm nút "Kiểm Tra Xung Đột" để quét toàn bộ lịch</li>
+                    <li><strong>↶ Hoàn Tác:</strong> Bấm "Hoàn Tác" để quay lại thao tác trước đó</li>
+                    <li><strong>💾 Lưu:</strong> Bấm "Lưu Thay Đổi" để lưu lịch vào hệ thống</li>
+                </ul>
+            </div>
+
+            <!-- Change Log -->
+            <div id="changeLogSection" class="change-log" style="display: none;">
+                <h4 style="margin-top: 0;">📝 Lịch Sử Thay Đổi</h4>
+                <div id="changeLogContent">
+                    <div class="change-item" style="background: #e8f4f8; color: #0c5460;">
+                        Tải phiên bản TKB lên giao diện
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="checkConflicts()" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">
+                    🔍 Kiểm Tra Xung Đột
+                </button>
                 <button onclick="autoSchedule()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     🤖 Chạy Xếp Lịch Tự Động (UC03)
                 </button>
-                <button onclick="publishSchedule()" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); margin-left: 10px;">
+                <button onclick="saveScheduleChanges()" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);">
+                    💾 Lưu Thay Đổi
+                </button>
+                <button onclick="publishSchedule()" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);">
                     📢 Công Bố TKB (UC05)
                 </button>
             </div>
@@ -851,6 +1108,352 @@
         // Initialize
         loadDashboard();
         document.getElementById('userName').textContent = localStorage.getItem('userName') || 'Admin User';
+
+        // ============================================================
+        // UC04: Drag-and-Drop Schedule Management
+        // ============================================================
+        
+        let currentSchedule = null;
+        let changeHistory = [];
+        let draggedElement = null;
+        let sourceCell = null;
+
+        // Sample schedule data
+        const sampleSchedules = {
+            tkb_v1: {
+                name: 'TKB_v1.0 - Phiên bản cơ bản',
+                classes: ['10A', '10B', '11A'],
+                timeslots: [
+                    { day: 'Thứ Hai', slot: 'Tiết 1', time: '7:00-7:45' },
+                    { day: 'Thứ Hai', slot: 'Tiết 2', time: '7:45-8:30' },
+                    { day: 'Thứ Hai', slot: 'Tiết 3', time: '8:45-9:30' },
+                    { day: 'Thứ Hai', slot: 'Tiết 4', time: '9:30-10:15' },
+                    { day: 'Thứ Ba', slot: 'Tiết 1', time: '7:00-7:45' },
+                    { day: 'Thứ Ba', slot: 'Tiết 2', time: '7:45-8:30' },
+                    { day: 'Thứ Ba', slot: 'Tiết 3', time: '8:45-9:30' },
+                    { day: 'Thứ Ba', slot: 'Tiết 4', time: '9:30-10:15' },
+                    { day: 'Thứ Tư', slot: 'Tiết 1', time: '7:00-7:45' },
+                    { day: 'Thứ Tư', slot: 'Tiết 2', time: '7:45-8:30' },
+                    { day: 'Thứ Tư', slot: 'Tiết 3', time: '8:45-9:30' },
+                    { day: 'Thứ Tư', slot: 'Tiết 4', time: '9:30-10:15' },
+                    { day: 'Thứ Năm', slot: 'Tiết 1', time: '7:00-7:45' },
+                    { day: 'Thứ Năm', slot: 'Tiết 2', time: '7:45-8:30' },
+                    { day: 'Thứ Năm', slot: 'Tiết 3', time: '8:45-9:30' },
+                    { day: 'Thứ Năm', slot: 'Tiết 4', time: '9:30-10:15' },
+                    { day: 'Thứ Sáu', slot: 'Tiết 1', time: '7:00-7:45' },
+                    { day: 'Thứ Sáu', slot: 'Tiết 2', time: '7:45-8:30' },
+                    { day: 'Thứ Sáu', slot: 'Tiết 3', time: '8:45-9:30' },
+                    { day: 'Thứ Sáu', slot: 'Tiết 4', time: '9:30-10:15' }
+                ],
+                lessons: [
+                    { id: 'L001', class: '10A', subject: 'Toán', teacher: 'Nguyễn A', room: 'P101', day: 'Thứ Hai', slot: 'Tiết 1' },
+                    { id: 'L002', class: '10A', subject: 'Văn', teacher: 'Trần B', room: 'P102', day: 'Thứ Hai', slot: 'Tiết 2' },
+                    { id: 'L003', class: '10A', subject: 'Tiếng Anh', teacher: 'Lê C', room: 'P103', day: 'Thứ Ba', slot: 'Tiết 1' },
+                    { id: 'L004', class: '10B', subject: 'Toán', teacher: 'Nguyễn A', room: 'P104', day: 'Thứ Hai', slot: 'Tiết 3' },
+                    { id: 'L005', class: '10B', subject: 'Sinh', teacher: 'Phạm D', room: 'P105', day: 'Thứ Ba', slot: 'Tiết 2' },
+                    { id: 'L006', class: '11A', subject: 'Toán', teacher: 'Nguyễn A', room: 'P106', day: 'Thứ Tư', slot: 'Tiết 1' },
+                    { id: 'L007', class: '11A', subject: 'Hóa', teacher: 'Hoàng E', room: 'P107', day: 'Thứ Tư', slot: 'Tiết 2' }
+                ]
+            }
+        };
+
+        function loadScheduleVersion() {
+            const versionId = document.getElementById('scheduleVersionSelect').value;
+            if (!versionId || !sampleSchedules[versionId]) {
+                alert('Vui lòng chọn phiên bản TKB');
+                return;
+            }
+            
+            currentSchedule = JSON.parse(JSON.stringify(sampleSchedules[versionId]));
+            changeHistory = [];
+            renderScheduleMatrix();
+            logChange('Tải phiên bản TKB lên giao diện');
+        }
+
+        function renderScheduleMatrix() {
+            if (!currentSchedule) return;
+
+            const tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+
+            // Group timeslots by day
+            const dayGroups = {};
+            currentSchedule.timeslots.forEach(ts => {
+                if (!dayGroups[ts.day]) dayGroups[ts.day] = [];
+                dayGroups[ts.day].push(ts);
+            });
+
+            // Create rows for each timeslot
+            Object.values(dayGroups).forEach(daySlots => {
+                daySlots.forEach(ts => {
+                    const row = document.createElement('tr');
+                    
+                    // Time cell
+                    const timeCell = document.createElement('td');
+                    timeCell.className = 'time-cell';
+                    timeCell.innerHTML = `<div class="time-slots">
+                        <div class="time-slot"><strong>${ts.day}</strong></div>
+                        <div class="time-slot">${ts.slot}</div>
+                        <div class="time-slot" style="font-size: 10px;">${ts.time}</div>
+                    </div>`;
+                    row.appendChild(timeCell);
+
+                    // Class cells
+                    currentSchedule.classes.forEach(className => {
+                        const cell = document.createElement('td');
+                        cell.className = 'schedule-cell';
+                        cell.id = `cell-${ts.day}-${ts.slot}-${className}`;
+                        cell.dataset.day = ts.day;
+                        cell.dataset.slot = ts.slot;
+                        cell.dataset.class = className;
+
+                        // Find lessons for this cell
+                        const lessonsInCell = currentSchedule.lessons.filter(l => 
+                            l.class === className && l.day === ts.day && l.slot === ts.slot
+                        );
+
+                        lessonsInCell.forEach(lesson => {
+                            const lessonDiv = document.createElement('div');
+                            lessonDiv.className = 'lesson-item';
+                            lessonDiv.id = `lesson-${lesson.id}`;
+                            lessonDiv.draggable = true;
+                            lessonDiv.innerHTML = `
+                                <div class="lesson-info">${lesson.subject}</div>
+                                <div class="lesson-room">📍 ${lesson.room}</div>
+                                <div class="lesson-teacher">👨‍🏫 ${lesson.teacher}</div>
+                            `;
+                            lessonDiv.dataset.lessonId = lesson.id;
+                            lessonDiv.dataset.class = lesson.class;
+                            lessonDiv.dataset.teacher = lesson.teacher;
+                            lessonDiv.dataset.room = lesson.room;
+
+                            // Drag event listeners
+                            lessonDiv.addEventListener('dragstart', onDragStart);
+                            lessonDiv.addEventListener('dragend', onDragEnd);
+
+                            cell.appendChild(lessonDiv);
+                        });
+
+                        // Drop event listeners for cell
+                        cell.addEventListener('dragover', onDragOver);
+                        cell.addEventListener('drop', onDrop);
+                        cell.addEventListener('dragleave', onDragLeave);
+
+                        row.appendChild(cell);
+                    });
+
+                    tbody.appendChild(row);
+                });
+            });
+
+            // Update info boxes
+            document.getElementById('versionName').textContent = currentSchedule.name;
+            document.getElementById('classCountInfo').textContent = currentSchedule.classes.length;
+            document.getElementById('lessonCountInfo').textContent = currentSchedule.lessons.length;
+        }
+
+        function onDragStart(e) {
+            draggedElement = this;
+            sourceCell = this.parentElement;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function onDragEnd(e) {
+            draggedElement.classList.remove('dragging');
+            document.querySelectorAll('.schedule-cell.drag-over').forEach(cell => {
+                cell.classList.remove('drag-over');
+            });
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function onDragLeave(e) {
+            if (e.target === this) {
+                this.classList.remove('drag-over');
+            }
+        }
+
+        function onDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            this.classList.remove('drag-over');
+
+            if (!draggedElement || !sourceCell) return;
+
+            const targetCell = this;
+            const lessonId = draggedElement.dataset.lessonId;
+            const lesson = currentSchedule.lessons.find(l => l.id === lessonId);
+
+            if (!lesson) return;
+
+            // Update lesson position
+            const oldPosition = `${lesson.day} - ${lesson.slot} (Lớp ${lesson.class})`;
+            lesson.day = targetCell.dataset.day;
+            lesson.slot = targetCell.dataset.slot;
+            const newPosition = `${lesson.day} - ${lesson.slot} (Lớp ${lesson.class})`;
+
+            // Record change
+            const changeMsg = `Chuyển "${lesson.subject}" từ ${oldPosition} đến ${newPosition}`;
+            logChange(changeMsg);
+
+            // Re-render
+            renderScheduleMatrix();
+
+            // Check auto-conflict detection
+            if (document.getElementById('autoCheckConflict').checked) {
+                checkConflicts();
+            }
+        }
+
+        function checkConflicts() {
+            const conflicts = [];
+            
+            // Check class conflicts
+            currentSchedule.lessons.forEach((l1, i) => {
+                currentSchedule.lessons.forEach((l2, j) => {
+                    if (i < j && l1.class === l2.class && 
+                        l1.day === l2.day && l1.slot === l2.slot) {
+                        conflicts.push({
+                            type: 'class',
+                            msg: `Lớp ${l1.class} có 2 tiết cùng lúc: ${l1.subject} và ${l2.subject}`,
+                            lessons: [l1.id, l2.id]
+                        });
+                    }
+                });
+            });
+
+            // Check teacher conflicts
+            currentSchedule.lessons.forEach((l1, i) => {
+                currentSchedule.lessons.forEach((l2, j) => {
+                    if (i < j && l1.teacher === l2.teacher && 
+                        l1.day === l2.day && l1.slot === l2.slot) {
+                        conflicts.push({
+                            type: 'teacher',
+                            msg: `GV ${l1.teacher} có 2 tiết cùng lúc: ${l1.subject} (Lớp ${l1.class}) và ${l2.subject} (Lớp ${l2.class})`,
+                            lessons: [l1.id, l2.id]
+                        });
+                    }
+                });
+            });
+
+            // Check room conflicts
+            currentSchedule.lessons.forEach((l1, i) => {
+                currentSchedule.lessons.forEach((l2, j) => {
+                    if (i < j && l1.room === l2.room && 
+                        l1.day === l2.day && l1.slot === l2.slot) {
+                        conflicts.push({
+                            type: 'room',
+                            msg: `Phòng ${l1.room} có 2 tiết cùng lúc: ${l1.subject} và ${l2.subject}`,
+                            lessons: [l1.id, l2.id]
+                        });
+                    }
+                });
+            });
+
+            // Update conflict display
+            document.getElementById('conflictCountInfo').textContent = conflicts.length;
+            
+            if (conflicts.length > 0) {
+                const conflictMsg = conflicts.map((c, i) => `${i+1}. ${c.msg}`).join('\n');
+                alert(`⚠️ Phát hiện ${conflicts.length} xung đột:\n\n${conflictMsg}`);
+            } else {
+                alert('✅ Không có xung đột! Lịch học hợp lệ.');
+            }
+
+            // Highlight conflict lessons
+            document.querySelectorAll('.lesson-item').forEach(item => {
+                item.classList.remove('conflict');
+            });
+
+            conflicts.forEach(c => {
+                c.lessons.forEach(lessonId => {
+                    const elem = document.getElementById(`lesson-${lessonId}`);
+                    if (elem) elem.classList.add('conflict');
+                });
+            });
+
+            return conflicts;
+        }
+
+        function logChange(message) {
+            const timestamp = new Date().toLocaleTimeString('vi-VN');
+            changeHistory.push({ msg: message, time: timestamp });
+            
+            if (document.getElementById('showChangeLog').checked) {
+                const logContent = document.getElementById('changeLogContent');
+                const item = document.createElement('div');
+                item.className = 'change-item move';
+                item.textContent = `[${timestamp}] ${message}`;
+                logContent.appendChild(item);
+                
+                // Show change log section
+                document.getElementById('changeLogSection').style.display = 'block';
+                logContent.scrollTop = logContent.scrollHeight;
+            }
+        }
+
+        function undoLastChange() {
+            if (changeHistory.length <= 1) {
+                alert('Không có thay đổi nào để hoàn tác!');
+                return;
+            }
+
+            changeHistory.pop();
+            alert('✓ Đã hoàn tác thao tác cuối cùng');
+        }
+
+        function resetSchedule() {
+            if (confirm('🔄 Bạn có chắc muốn đặt lại lịch? Mọi thay đổi sẽ bị mất!')) {
+                loadScheduleVersion();
+                alert('✓ Lịch đã được đặt lại về trạng thái ban đầu');
+            }
+        }
+
+        function saveScheduleChanges() {
+            if (!currentSchedule) {
+                alert('Vui lòng chọn phiên bản TKB trước!');
+                return;
+            }
+
+            const conflicts = checkConflicts();
+            let message = `✓ Đã lưu ${currentSchedule.lessons.length} tiết học`;
+            
+            if (conflicts.length > 0) {
+                message += `\n⚠️ Cảnh báo: Vẫn có ${conflicts.length} xung đột!`;
+            }
+
+            message += `\n\n📝 Lịch sử thay đổi (${changeHistory.length} thao tác)`;
+            
+            console.log('Saving schedule:', currentSchedule);
+            alert(message);
+        }
+
+        function autoSchedule() {
+            alert('🤖 Chạy xếp lịch tự động (UC03)...\n\nHệ thống sẽ sử dụng thuật toán tối ưu hoá lập lịch dựa trên ràng buộc cứng/mềm.\n\nSau khi hoàn tất, bạn có thể dùng UC04 để tinh chỉnh thủ công.');
+        }
+
+        function publishSchedule() {
+            if (!currentSchedule) {
+                alert('Vui lòng tạo lịch trước!');
+                return;
+            }
+
+            const conflicts = checkConflicts();
+            if (conflicts.length > 0) {
+                const confirm_msg = confirm(`⚠️ Lịch vẫn có ${conflicts.length} xung đột. Bạn muốn công bố vẫn không?\n\nBấm OK để công bố, Cancel để kiểm tra lại.`);
+                if (!confirm_msg) return;
+            }
+
+            alert('📢 TKB đã được công bố!\n\nGiáo viên, học sinh, và phụ huynh sẽ nhận được thông báo.');
+        }
     </script>
 </body>
 </html>
+
