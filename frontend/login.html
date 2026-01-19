@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập TKB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .login-header p {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .role-btn {
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+      color: #666;
+    }
+
+    .role-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .role-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .demo-users {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    .demo-users h4 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .demo-user-item {
+      margin-bottom: 8px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .demo-user-item strong {
+      color: #333;
+    }
+
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 13px;
+    }
+
+    .success-message {
+      background: #efe;
+      color: #3c3;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 13px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>🎓 TKB Demo</h1>
+      <p>Hệ Thống Quản Lý Thời Khóa Biểu</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+
+    <div class="role-selector">
+      <button class="role-btn active" data-role="admin">👨‍💼 Giáo Vụ</button>
+      <button class="role-btn" data-role="teacher">👨‍🏫 Giáo Viên</button>
+      <button class="role-btn" data-role="student">👨‍🎓 Học Sinh</button>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Tên Đăng Nhập</label>
+        <input type="text" id="username" name="username" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật Khẩu</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">Đăng Nhập</button>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px; color: #666; font-size: 13px;">Đang xử lý...</p>
+      </div>
+    </form>
+
+    <div class="demo-users">
+      <h4>📋 Tài Khoản Demo (Ví Dụ):</h4>
+      <div class="demo-user-item">
+        <strong>Giáo Vụ:</strong> admin01 / 123456
+      </div>
+      <div class="demo-user-item">
+        <strong>Giáo Viên:</strong> teacher01 / 123456
+      </div>
+      <div class="demo-user-item">
+        <strong>Học Sinh:</strong> student01 / 123456
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helper function to get role label in Vietnamese
+    function getRoleLabel(role) {
+      const roleLabels = {
+        'admin': 'Giáo Vụ',
+        'teacher': 'Giáo Viên',
+        'student': 'Học Sinh'
+      };
+      return roleLabels[role] || role;
+    }
+
+    // Auto-detect API URL based on current domain
+    function getApiUrl() {
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
+      
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // Local development
+        return 'http://localhost:3001/api';
+      } else if (hostname.includes('onrender.com')) {
+        // Render cloud backend
+        return 'https://tkb-demo-backend.onrender.com/api';
+      } else {
+        // Remote URL (Localtunnel, Ngrok, etc)
+        return `${protocol}//${hostname}/api`;
+      }
+    }
+
+    const API_URL = getApiUrl();
+    console.log('Using API URL:', API_URL);
+    
+    let selectedRole = 'admin';
+
+    // Role selection
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        selectedRole = this.dataset.role;
+        document.getElementById('username').focus();
+      });
+    });
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const loading = document.getElementById('loading');
+      const errorMsg = document.getElementById('errorMessage');
+      const successMsg = document.getElementById('successMessage');
+
+      // Clear messages
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
+
+      // Show loading
+      loginBtn.disabled = true;
+      loading.style.display = 'block';
+
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // CHECK: Vai trò tài khoản có khớp với vai trò được chọn không?
+          const userRole = data.user.role;
+          
+          if (userRole !== selectedRole) {
+            throw new Error(`❌ Tài khoản này là ${getRoleLabel(userRole)}, không phải ${getRoleLabel(selectedRole)}. Vui lòng chọn vai trò đúng!`);
+          }
+
+          // Save to localStorage
+          localStorage.setItem('token', data.token || username);
+          localStorage.setItem('userId', data.user.id || username);
+          localStorage.setItem('userRole', userRole);
+          localStorage.setItem('userName', data.user.fullName || username);
+
+          successMsg.textContent = '✓ Đăng nhập thành công!';
+          successMsg.style.display = 'block';
+
+          // Redirect based on role
+          setTimeout(() => {
+            if (userRole === 'admin') {
+              window.location.href = './admin/index.html';
+            } else if (userRole === 'teacher') {
+              window.location.href = './mobile/index.html';
+            } else if (userRole === 'student') {
+              window.location.href = './student/index.html';
+            }
+          }, 800);
+        } else {
+          throw new Error(data.message || 'Đăng nhập thất bại');
+        }
+      } catch (error) {
+        errorMsg.textContent = '❌ ' + error.message;
+        errorMsg.style.display = 'block';
+        loginBtn.disabled = false;
+        loading.style.display = 'none';
+      }
+    });
+
+    // Auto-fill demo credentials (for testing)
+    const demoCredentials = {
+      admin: { username: 'admin01', password: '123456' },
+      teacher: { username: 'teacher01', password: '123456' },
+      student: { username: 'student01', password: '123456' }
+    };
+  </script>
+</body>
+</html>

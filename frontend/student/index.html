@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Lịch Học - TKB System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            text-align: center;
+            flex: 1;
+        }
+
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        header p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .user-info .role {
+            color: #999;
+        }
+
+        .user-info .name {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+        }
+
+        .selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .select-group {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .select-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .select-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .select-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .schedule-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .table-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .period {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .subject {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .teacher {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .room {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .notification-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-item {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .notification-item.info {
+            border-left-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .notification-item.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .notification-item.alert {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .legend {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .time-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .day-schedule {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .periods {
+            padding: 15px;
+        }
+
+        .period-item {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .period-time {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .period-detail {
+            color: #666;
+            margin: 2px 0;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .selection {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Auto-detect API URL
+        function getApiUrl() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:3001/api';
+            } else {
+                return `${protocol}//${hostname}/api`;
+            }
+        }
+
+        const API_URL = getApiUrl();
+        console.log('Student API URL:', API_URL);
+
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '../login.html';
+                return;
+            }
+        });
+
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('userName');
+                window.location.href = '../login.html';
+            }
+        }
+    </script>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📚 Tra Cứu Lịch Học</h1>
+            <p>Hệ Thống Quản Lý Thời Khóa Biểu (TKB) - UC10 & UC11</p>
+            <p style="font-size: 13px; color: #999;">Xem lịch học chi tiết và nhận thông báo khi có thay đổi</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="role">👤 Học Sinh</div>
+                    <div class="name" id="userName">Student User</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">🚪 Đăng Xuất</button>
+            </div>
+        </header>
+
+        <div class="info-box">
+            ℹ️ <strong>Mở rộng tương lai (UC11):</strong> Bạn sẽ nhận được thông báo ngay lập tức qua App hoặc Zalo khi 
+            giáo viên nghỉ hoặc thay đổi lịch học.
+        </div>
+
+        <div class="selection">
+            <div class="select-group">
+                <label for="classSelect">🎓 Chọn Lớp Học</label>
+                <select id="classSelect" onchange="updateSchedule()">
+                    <option value="">-- Chọn lớp --</option>
+                    <option value="10A" selected>Lớp 10A</option>
+                    <option value="10B">Lớp 10B</option>
+                    <option value="11A">Lớp 11A</option>
+                </select>
+            </div>
+            <div class="select-group">
+                <label for="viewSelect">📊 Cách Xem</label>
+                <select id="viewSelect" onchange="updateSchedule()">
+                    <option value="table">Bảng (Theo Thứ)</option>
+                    <option value="card">Thẻ (Theo Ngày)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="notification-panel">
+            <h3>🔔 Thông Báo Gần Đây</h3>
+            <div class="notification-item info">
+                <strong>ℹ️ Thay Đổi Lịch:</strong> Tiết 5 Thứ Tư - Tiếng Anh - Giáo viên Phạm Thị D thay thế bằng Lê Văn E
+            </div>
+            <div class="notification-item alert">
+                <strong>⚠️ Giáo Viên Nghỉ:</strong> Tiết 1-2 Thứ Năm - Toán - Giáo viên Nguyễn Văn A báo nghỉ, sẽ dạy bù vào Thứ 7
+            </div>
+            <div class="notification-item warning">
+                <strong>📢 Thông Báo:</strong> Lịch học của lớp 10A sẽ được công bố lại vào hôm nay
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="tableView" class="schedule-grid" style="display: block;">
+            <div class="legend">
+                <h3>📌 Hướng Dẫn Đọc Lịch</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <span>Môn Học Bắt Buộc</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #d4edda;"></div>
+                        <span>Môn Tự Chọn</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #fff3cd;"></div>
+                        <span>Hoạt Động Ngoài Khóa</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-table">
+                <div class="table-header">
+                    <h2>📅 Lịch Học Lớp 10A</h2>
+                    <p>Tuần 1 - Tháng 1 năm 2025</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Tiết</th>
+                            <th style="width: 100px;">Thứ Hai</th>
+                            <th style="width: 100px;">Thứ Ba</th>
+                            <th style="width: 100px;">Thứ Tư</th>
+                            <th style="width: 100px;">Thứ Năm</th>
+                            <th style="width: 100px;">Thứ Sáu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="period">Tiết 1<br>7:00-7:45</td>
+                            <td>
+                                <div class="subject">Toán Học</div>
+                                <div class="teacher">GV: Nguyễn Văn A</div>
+                                <div class="room">P101</div>
+                            </td>
+                            <td>
+                                <div class="subject">Lý Học</div>
+                                <div class="teacher">GV: Trần Văn B</div>
+                                <div class="room">P105</div>
+                            </td>
+                            <td>
+                                <div class="subject">Hóa Học</div>
+                                <div class="teacher">GV: Lê Văn C</div>
+                                <div class="room">P106</div>
+                            </td>
+                            <td>
+                                <div class="subject">Sử Học</div>
+                                <div class="teacher">GV: Phạm Thị D</div>
+                                <div class="room">P201</div>
+                            </td>
+                            <td>
+                                <div class="subject">Địa Lý</div>
+                                <div class="teacher">GV: Đỗ Thị E</div>
+                                <div class="room">P202</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="period">Tiết 2<br>7:45-8:30</td>
+                            <td>
+                                <div class="subject">Toán Học</div>
+                                <div class="teacher">GV: Nguyễn Văn A</div>
+                                <div class="room">P101</div>
+                            </td>
+                            <td>
+                                <div class="subject">Tiếng Anh</div>
+                                <div class="teacher">GV: Hoàng Văn F</div>
+                                <div class="room">P102</div>
+                            </td>
+                            <td>
+                                <div class="subject">Công Nghệ</div>
+                                <div class="teacher">GV: Lê Văn G</div>
+                                <div class="room">P301</div>
+                            </td>
+                            <td>
+                                <div class="subject">Sinh Học</div>
+                                <div class="teacher">GV: Cao Thị H</div>
+                                <div class="room">P305</div>
+                            </td>
+                            <td>
+                                <div class="subject">Giáo Dục Công Dân</div>
+                                <div class="teacher">GV: Võ Văn I</div>
+                                <div class="room">P202</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="period">Tiết 3<br>8:30-9:15</td>
+                            <td>
+                                <div class="subject">Văn Học</div>
+                                <div class="teacher">GV: Ngô Thị J</div>
+                                <div class="room">P103</div>
+                            </td>
+                            <td>
+                                <div class="subject">Lý Học</div>
+                                <div class="teacher">GV: Trần Văn B</div>
+                                <div class="room">P105</div>
+                            </td>
+                            <td>
+                                <div class="subject">Tiếng Anh</div>
+                                <div class="teacher">GV: Hoàng Văn F</div>
+                                <div class="room">P102</div>
+                            </td>
+                            <td>
+                                <div class="subject">Toán Học</div>
+                                <div class="teacher">GV: Nguyễn Văn A</div>
+                                <div class="room">P101</div>
+                            </td>
+                            <td>
+                                <div class="subject">Thể Dục</div>
+                                <div class="teacher">GV: Phan Văn K</div>
+                                <div class="room">Sân</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="period">Tiết 4<br>9:30-10:15</td>
+                            <td>
+                                <div class="subject">Hóa Học</div>
+                                <div class="teacher">GV: Lê Văn C</div>
+                                <div class="room">P106</div>
+                            </td>
+                            <td>
+                                <div class="subject">Công Nghệ</div>
+                                <div class="teacher">GV: Lê Văn G</div>
+                                <div class="room">P301</div>
+                            </td>
+                            <td>
+                                <div class="subject">Sinh Học</div>
+                                <div class="teacher">GV: Cao Thị H</div>
+                                <div class="room">P305</div>
+                            </td>
+                            <td>
+                                <div class="subject">Văn Học</div>
+                                <div class="teacher">GV: Ngô Thị J</div>
+                                <div class="room">P103</div>
+                            </td>
+                            <td>
+                                <div class="subject">Âm Nhạc</div>
+                                <div class="teacher">GV: Tạ Thị L</div>
+                                <div class="room">P302</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="period">Tiết 5<br>10:15-11:00</td>
+                            <td>
+                                <div class="subject">Tiếng Anh</div>
+                                <div class="teacher">GV: Hoàng Văn F</div>
+                                <div class="room">P102</div>
+                            </td>
+                            <td>
+                                <div class="subject">Sinh Học</div>
+                                <div class="teacher">GV: Cao Thị H</div>
+                                <div class="room">P305</div>
+                            </td>
+                            <td>
+                                <div class="subject">Hóa Học</div>
+                                <div class="teacher">GV: Lê Văn C</div>
+                                <div class="room">P106</div>
+                            </td>
+                            <td>
+                                <div class="subject">Công Nghệ</div>
+                                <div class="teacher">GV: Lê Văn G</div>
+                                <div class="room">P301</div>
+                            </td>
+                            <td>
+                                <div class="subject">Quốc Phòng</div>
+                                <div class="teacher">GV: Bùi Văn M</div>
+                                <div class="room">P401</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="padding: 20px; background: white; border-radius: 8px; margin-top: 20px; font-size: 13px; color: #666;">
+                <strong>📌 Ghi chú:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Lịch học có thể thay đổi theo quyết định của nhà trường</li>
+                    <li>Khi có thay đổi, bạn sẽ nhận được thông báo ngay lập tức</li>
+                    <li>Liên hệ với phòng Giáo Vụ nếu có câu hỏi về lịch học</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card View (Optional) -->
+        <div id="cardView" style="display: none;">
+            <div class="time-view">
+                <div class="day-schedule">
+                    <div class="day-header">📅 Thứ Hai, 20/01</div>
+                    <div class="periods">
+                        <div class="period-item">
+                            <div class="period-time">Tiết 1 (7:00-7:45)</div>
+                            <div class="period-detail">📚 Toán Học</div>
+                            <div class="period-detail">👨‍🏫 GV: Nguyễn Văn A</div>
+                            <div class="period-detail">📍 Phòng P101</div>
+                        </div>
+                        <div class="period-item">
+                            <div class="period-time">Tiết 2 (7:45-8:30)</div>
+                            <div class="period-detail">📚 Toán Học</div>
+                            <div class="period-detail">👨‍🏫 GV: Nguyễn Văn A</div>
+                            <div class="period-detail">📍 Phòng P101</div>
+                        </div>
+                        <div class="period-item">
+                            <div class="period-time">Tiết 3 (8:30-9:15)</div>
+                            <div class="period-detail">📚 Văn Học</div>
+                            <div class="period-detail">👨‍🏫 GV: Ngô Thị J</div>
+                            <div class="period-detail">📍 Phòng P103</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>TKB System v1.0.0 | Hệ Thống Quản Lý Thời Khóa Biểu THPT</p>
+        <p>Liên hệ: Phòng Giáo Vụ - Email: giaovu@school.edu.vn - ĐT: 0912 345 678</p>
+    </footer>
+
+    <script>
+        function updateSchedule() {
+            const viewSelect = document.getElementById('viewSelect');
+            if (viewSelect.value === 'card') {
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('cardView').style.display = 'grid';
+            } else {
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('cardView').style.display = 'none';
+            }
+        }
+
+        // Load user name
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('userName').textContent = localStorage.getItem('userName') || 'Student User';
+        });
+    </script>
+</body>
+</html>
